@@ -1,12 +1,23 @@
-const express = require("express");
+const mongoose = require("mongoose");
+const app = require("./app");
+const config = require("./src/configs/index");
 
-const app = express();
-const PORT = 80;
+(async () => {
+  try {
+    await mongoose.connect(config.MONGODB_URL);
+    console.log("Database has been connected successfully");
 
-app.get("/", (req, res) => {
-  res.status(200).send("Hello World !");
-});
+    app.on("error", (err) => {
+      console.log("Error", err);
+      throw err;
+    });
 
-app.listen(PORT, () => {
-  console.log(`Server is Running at http://localhost:${PORT}`);
-});
+    const onListening = () => {
+      console.log(`Server is listening on ${config.PORT}`);
+    };
+
+    app.listen(config.PORT, onListening);
+  } catch (err) {
+    console.log("Error", err);
+  }
+})();
